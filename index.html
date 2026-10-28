@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>CRAWLER_DATA // RETRO_POP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-blue: #5C97D4; /* 图中的背景蓝 */
+            --panel-blue: #85B9E0; /* 磁带机的浅蓝 */
+            --accent-orange: #FF7B00; /* 耳机的亮橙 */
+            --text-black: #111111;
+            --white: #FFFFFF;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Space Grotesk', sans-serif; }
+
+        /* 经典的几何拼接背景 */
+        body {
+            background-color: var(--bg-blue);
+            background-image: 
+                /* 模拟白色粗线条交叉 */
+                linear-gradient(var(--white) 15px, transparent 15px),
+                linear-gradient(90deg, var(--white) 15px, transparent 15px),
+                /* 模拟蓝白相间的圆角块 */
+                radial-gradient(circle at 10% 20%, var(--bg-blue) 50%, transparent 50%),
+                radial-gradient(circle at 90% 80%, var(--bg-blue) 50%, transparent 50%);
+            background-size: 200px 200px, 200px 200px, 300px 300px, 300px 300px;
+            background-position: 0 0, 0 0, 0 0, 50px 50px;
+            color: var(--text-black);
+            min-height: 100vh;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .main-wrapper {
+            width: 100%;
+            max-width: 1100px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        /* 顶部巨幅标题 */
+        .header {
+            background-color: var(--white);
+            border: 4px solid var(--text-black);
+            box-shadow: 8px 8px 0 var(--text-black);
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transform: rotate(-1deg); /* 微微倾斜，增加波普感 */
+        }
+
+        .header h1 {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 32px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .header .badge {
+            background-color: var(--accent-orange);
+            color: var(--white);
+            padding: 5px 15px;
+            font-weight: bold;
+            border: 3px solid var(--text-black);
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        /* 中间的数据卡片区 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .stat-card {
+            background-color: var(--panel-blue);
+            border: 4px solid var(--text-black);
+            box-shadow: 6px 6px 0 var(--text-black);
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translate(-3px, -3px);
+            box-shadow: 9px 9px 0 var(--text-black);
+        }
+
+        /* 卡片里的装饰线条 (模拟图中的磁带纹路) */
+        .stat-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 10px;
+            background: repeating-linear-gradient(90deg, var(--text-black), var(--text-black) 2px, transparent 2px, transparent 4px);
+        }
+
+        .stat-card h3 {
+            font-size: 14px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            font-weight: 700;
+            margin-top: 10px;
+        }
+
+        .stat-value {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 42px;
+            color: var(--text-black);
+        }
+
+        /* 状态用橙色高亮 */
+        #status-container {
+            background-color: var(--white);
+        }
+        #status-container .stat-value { color: var(--accent-orange); }
+
+        /* 数据表格区 */
+        .table-panel {
+            background-color: var(--white);
+            border: 4px solid var(--text-black);
+            box-shadow: 10px 10px 0 var(--text-black);
+            overflow: hidden;
+        }
+
+        .table-header {
+            background-color: var(--text-black);
+            color: var(--white);
+            padding: 15px 25px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-header .dots {
+            display: flex; gap: 8px;
+        }
+        .table-header .dots span {
+            width: 12px; height: 12px; background: var(--white); border-radius: 50%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 18px 25px;
+            text-align: left;
+            border-bottom: 2px solid var(--text-black);
+            font-size: 15px;
+        }
+
+        th {
+            background-color: var(--panel-blue);
+            font-family: 'Archivo Black', sans-serif;
+            text-transform: uppercase;
+            border-bottom: 4px solid var(--text-black);
+        }
+
+        /* 鼠标悬停效果：橙色背景反色 */
+        tr:hover {
+            background-color: var(--accent-orange);
+            color: var(--white);
+        }
+
+        tr:hover .td-title { color: var(--white); }
+
+        .td-title { font-weight: 700; color: var(--text-black); }
+        .td-price { font-weight: bold; }
+        .td-upc { font-family: monospace; background: #eee; padding: 2px 6px; border: 1px solid #ccc; border-radius: 4px; }
+
+        /* 错误提示 */
+        .error-msg {
+            display: none; padding: 40px; text-align: center; color: var(--text-black); 
+            font-size: 20px; font-weight: bold; background: var(--accent-orange); border-bottom: 4px solid var(--text-black);
+        }
+
+        @media (max-width: 900px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .header { flex-direction: column; gap: 15px; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-wrapper">
+        
+        <!-- 头部 -->
+        <header class="header">
+            <h1>CRAWLER DATA</h1>
+            <div class="badge">RECORDS_ACTIVE</div>
+        </header>
+
+        <!-- 数据卡片 -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <h3>TOTAL_BOOKS</h3>
+                <div class="stat-value" id="total-books">--</div>
+            </div>
+            
+            <div class="stat-card">
+                <h3>AVG_PRICE_GBP</h3>
+                <div class="stat-value" id="avg-price">--</div>
+            </div>
+
+            <div class="stat-card" id="status-container">
+                <h3>DATA_LINK</h3>
+                <div class="stat-value" id="status">WAIT</div>
+            </div>
+        </section>
+
+        <!-- 数据表格 -->
+        <section class="table-panel">
+            <div class="table-header">
+                <span>DATABASE_VIEW.JSON</span>
+                <div class="dots">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+            
+            <div class="error-msg" id="error-box">
+                [ ERROR ] FILE NOT FOUND.<br>
+                <span style="font-size: 14px;">请确保已运行 `node index.js` 且 JSON 文件在同目录。</span>
+            </div>
+            
+            <table id="book-table">
+                <thead>
+                    <tr>
+                        <th>TITLE</th>
+                        <th>PRICE</th>
+                        <th>UPC_CODE</th>
+                        <th>STOCK</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <tr><td colspan="4" style="text-align: center; font-weight: bold;">LOADING...</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+    </div>
+
+    <script>
+        // 读取数据
+        fetch('./books_detailed.json')
+            .then(response => {
+                if(!response.ok) throw new Error('File not found');
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById('status').innerText = 'OK';
+                document.getElementById('status').style.color = '#111111';
+                document.getElementById('status-container').style.backgroundColor = '#85B9E0'; // 恢复蓝色
+                
+                document.getElementById('total-books').innerText = data.length;
+                
+                let totalPrice = 0;
+                data.forEach(book => {
+                    totalPrice += parseFloat(book.price.replace('£', ''));
+                });
+                document.getElementById('avg-price').innerText = (totalPrice / data.length).toFixed(2);
+
+                const tbody = document.getElementById('table-body');
+                tbody.innerHTML = ''; 
+                
+                data.forEach((book, index) => {
+                    // 添加一点渲染延迟，让页面有动态出现的感觉
+                    setTimeout(() => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td class="td-title">${book.title}</td>
+                            <td class="td-price">${book.price}</td>
+                            <td><span class="td-upc">${book.upc}</span></td>
+                            <td>${book.stock}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    }, index * 40);
+                });
+            })
+            .catch(error => {
+                console.error('读取失败:', error);
+                document.getElementById('status').innerText = 'FAIL';
+                document.getElementById('status-container').style.backgroundColor = '#FF7B00';
+                document.getElementById('error-box').style.display = 'block';
+                document.getElementById('table-body').innerHTML = '';
+            });
+    </script>
+</body>
+</html>
