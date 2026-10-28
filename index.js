@@ -2,56 +2,73 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const fs = require('fs');
 
-async function scrapeMyBlog() {
-    const url = 'https://jinyinzao-blog.github.io/'; 
-    try {
-        const { data } = await axios.get(url);
-        const $ = cheerio.load(data);
-        
-        let results = [];
+// 基础 URL
+const BASE_URL = 'https://books.toscrape.com/catalogue/page-';
+const TOTAL_PAGES = 3; // 我们只抓前 3 页作为测试
 
-        // 抓取所有 a 标签
-        $('a').each((index, element) => {
-            const title = $(element).text().trim();
-            const link = $(element).attr('href');
-            
-            // 🛡️ 智能过滤逻辑：
-            // 1. 标题不能为空，长度最好大于 4
-            // 2. 必须存在链接
-            // 3. 排除导航栏的特定文字（比如 Search、首页、标签等）
-            // 4. 排除 javascript:void(0) 这种死链接
-            const ignoreWords = ['Search', '首页', '标签', '归档', '关于', '分类'];
-            
-            if (title && title.length > 4 && link && !link.startsWith('javascript')) {
-                if (!ignoreWords.includes(title)) {
-                    // 拼接完整链接
-                    const fullLink = link.startsWith('http') ? link : url + link;
-                    
-                    results.push({
-                        title: title,
-                        url: fullLink
-                    });
-                }
-            }
-        });
+// 延迟函数，防止请求过快被封
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-        // 去重（因为有些文章标题可能在首页出现两次）
-        const uniqueResults = Array.from(new Set(results.map(a => a.url)))
-            .map(url => {
-                return results.find(a => a.url === url);
+async function scrapeBooks() {
+    let allBooks = [];
+    console.log(`🚀 开始抓取 ${TOTAL_PAGES} 页书籍数据...`);
+
+    for (let page = 1; page <= TOTAL_PAGES; page++) {
+        const url = `${BASE_URL}${page}.html`;
+        console.log(`\n正在抓取第 ${page} 页: ${url}`);
+
+        try {
+            // 1. 发起请求
+            const { data } = await axios.get(url);
+            const $ = cheerio.load(data);
+
+            // 2. 找到所有的书籍卡片
+            const bookElements = $('.product_pod');
+
+            bookElements.each((index, element) => {
+                // 提取书名 (在 h3 下的 a 标签的 title 属性里)
+                const title = $(element).find('h3 a').attr('title');
+                
+                // 提取价格 (在带有 price_color 类的 p 标签里)
+                const price = $(element).find('.price_color').text().trim();
+                
+                // 提取评分 (带有 star-rating 类的 p 标签，它的 class 里包含评分等级)
+                const ratingClass = $(element).find('.star-rating').attr('class');
+                // 例如 "star-rating Three"，我们把前面的删掉，只留 "Three"
+                const rating = ratingClass.replace('star-rating ', '');
+
+                allBooks.push({
+                    title,
+                    price,
+                    rating
+                });
             });
 
-        // 打印结果
-        console.log(`=== 成功抓取到 ${uniqueResults.length} 篇文章 ===`);
-        console.table(uniqueResults);
+            console.log(`✅ 第 ${page} 页抓取完成，当前共获取 ${allBooks.length} 本书。`);
 
-        // 保存为 JSON 文件
-        fs.writeFileSync('my_blog_data.json', JSON.stringify(uniqueResults, null, 2), 'utf-8');
-        console.log('✅ 数据已成功保存到 my_blog_data.json 文件中！');
+            // 每次翻页前休息 1.5 秒
+            if (page < TOTAL_PAGES) {
+                console.log("等待 1.5 秒后翻页...");
+                await delay(1500);
+            }
 
-    } catch (error) {
-        console.error("抓取失败:", error.message);
+        } catch (error) {
+            console.error(`❌ 第 ${page} 页抓取失败:`, error.message);
+        }
     }
+
+    // 3. 数据保存与展示
+    console.log('\n====================================');
+    console.log(`🎉 全部抓取完毕！共获取 ${allBooks.length} 本书。`);
+    
+    // 打印前 5 本书看看效果
+    console.log("预览前 5 本：");
+    console.table(allBooks.slice(0, 5));
+
+    // 4. 写入 JSON 文件
+    fs.writeFileSync('books_data.json', JSON.stringify(allBooks, null, 2), 'utf-8');
+    console.log('📁 数据已成功保存到 books_data.json 文件中！');
 }
 
-scrapeMyBlog();
+// 启动爬虫
+scrapeBooks();
