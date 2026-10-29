@@ -6,9 +6,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-blue: #5C97D4; /* 图中的背景蓝 */
-            --panel-blue: #85B9E0; /* 磁带机的浅蓝 */
-            --accent-orange: #FF7B00; /* 耳机的亮橙 */
+            --bg-blue: #5C97D4;
+            --panel-blue: #85B9E0;
+            --accent-orange: #FF7B00;
+            --accent-yellow: #FFD700;
             --text-black: #111111;
             --white: #FFFFFF;
         }
@@ -19,10 +20,8 @@
         body {
             background-color: var(--bg-blue);
             background-image: 
-                /* 模拟白色粗线条交叉 */
                 linear-gradient(var(--white) 15px, transparent 15px),
                 linear-gradient(90deg, var(--white) 15px, transparent 15px),
-                /* 模拟蓝白相间的圆角块 */
                 radial-gradient(circle at 10% 20%, var(--bg-blue) 50%, transparent 50%),
                 radial-gradient(circle at 90% 80%, var(--bg-blue) 50%, transparent 50%);
             background-size: 200px 200px, 200px 200px, 300px 300px, 300px 300px;
@@ -34,15 +33,9 @@
             justify-content: center;
         }
 
-        .main-wrapper {
-            width: 100%;
-            max-width: 1100px;
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-        }
+        .main-wrapper { width: 100%; max-width: 1100px; display: flex; flex-direction: column; gap: 30px; }
 
-        /* 顶部巨幅标题 */
+        /* 头部 */
         .header {
             background-color: var(--white);
             border: 4px solid var(--text-black);
@@ -51,134 +44,53 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transform: rotate(-1deg); /* 微微倾斜，增加波普感 */
+            transform: rotate(-1deg);
         }
+        .header h1 { font-family: 'Archivo Black', sans-serif; font-size: 32px; letter-spacing: 2px; text-transform: uppercase; }
+        .header .badge { background-color: var(--accent-orange); color: var(--white); padding: 5px 15px; font-weight: bold; border: 3px solid var(--text-black); border-radius: 20px; font-size: 14px; }
 
-        .header h1 {
-            font-family: 'Archivo Black', sans-serif;
-            font-size: 32px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
+        /* 数据卡片 */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .stat-card { background-color: var(--panel-blue); border: 4px solid var(--text-black); box-shadow: 6px 6px 0 var(--text-black); padding: 25px; position: relative; transition: transform 0.2s; }
+        .stat-card:hover { transform: translate(-3px, -3px); box-shadow: 9px 9px 0 var(--text-black); }
+        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 10px; background: repeating-linear-gradient(90deg, var(--text-black), var(--text-black) 2px, transparent 2px, transparent 4px); }
+        .stat-card h3 { font-size: 14px; text-transform: uppercase; margin-bottom: 10px; margin-top: 10px; font-weight: 700;}
+        .stat-value { font-family: 'Archivo Black', sans-serif; font-size: 42px; color: var(--text-black); }
+        #status-container { background-color: var(--panel-blue); }
+        #status-container .stat-value { color: var(--text-black); }
 
-        .header .badge {
-            background-color: var(--accent-orange);
-            color: var(--white);
-            padding: 5px 15px;
-            font-weight: bold;
-            border: 3px solid var(--text-black);
-            border-radius: 20px;
-            font-size: 14px;
-        }
-
-        /* 中间的数据卡片区 */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-        }
-
-        .stat-card {
-            background-color: var(--panel-blue);
-            border: 4px solid var(--text-black);
-            box-shadow: 6px 6px 0 var(--text-black);
-            padding: 25px;
-            position: relative;
-            overflow: hidden;
-            transition: transform 0.2s;
-        }
-
-        .stat-card:hover {
-            transform: translate(-3px, -3px);
-            box-shadow: 9px 9px 0 var(--text-black);
-        }
-
-        /* 卡片里的装饰线条 (模拟图中的磁带纹路) */
-        .stat-card::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 10px;
-            background: repeating-linear-gradient(90deg, var(--text-black), var(--text-black) 2px, transparent 2px, transparent 4px);
-        }
-
-        .stat-card h3 {
-            font-size: 14px;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-            font-weight: 700;
-            margin-top: 10px;
-        }
-
-        .stat-value {
-            font-family: 'Archivo Black', sans-serif;
-            font-size: 42px;
-            color: var(--text-black);
-        }
-
-        /* 状态用橙色高亮 */
-        #status-container {
-            background-color: var(--white);
-        }
-        #status-container .stat-value { color: var(--accent-orange); }
-
-        /* 数据表格区 */
-        .table-panel {
-            background-color: var(--white);
-            border: 4px solid var(--text-black);
-            box-shadow: 10px 10px 0 var(--text-black);
-            overflow: hidden;
-        }
-
-        .table-header {
-            background-color: var(--text-black);
-            color: var(--white);
-            padding: 15px 25px;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .table-header .dots {
-            display: flex; gap: 8px;
-        }
-        .table-header .dots span {
-            width: 12px; height: 12px; background: var(--white); border-radius: 50%;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            padding: 18px 25px;
-            text-align: left;
-            border-bottom: 2px solid var(--text-black);
-            font-size: 15px;
-        }
-
-        th {
-            background-color: var(--panel-blue);
-            font-family: 'Archivo Black', sans-serif;
-            text-transform: uppercase;
-            border-bottom: 4px solid var(--text-black);
-        }
-
-        /* 鼠标悬停效果：橙色背景反色 */
-        tr:hover {
-            background-color: var(--accent-orange);
-            color: var(--white);
-        }
-
+        /* 表格 */
+        .table-panel { background-color: var(--white); border: 4px solid var(--text-black); box-shadow: 10px 10px 0 var(--text-black); overflow: hidden; }
+        .table-header { background-color: var(--text-black); color: var(--white); padding: 15px 25px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        .table-header .dots span { display: inline-block; width: 12px; height: 12px; background: var(--white); border-radius: 50%; margin-left: 8px; }
+        
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 18px 25px; text-align: left; border-bottom: 3px solid var(--text-black); font-size: 15px; vertical-align: middle; }
+        th { background-color: var(--panel-blue); font-family: 'Archivo Black', sans-serif; text-transform: uppercase; border-bottom: 4px solid var(--text-black); }
+        
+        tr:hover { background-color: var(--accent-orange); color: var(--white); }
         tr:hover .td-title { color: var(--white); }
-
+        
         .td-title { font-weight: 700; color: var(--text-black); }
-        .td-price { font-weight: bold; }
-        .td-upc { font-family: monospace; background: #eee; padding: 2px 6px; border: 1px solid #ccc; border-radius: 4px; }
+        .td-price { font-weight: bold; font-size: 18px; }
 
-        /* 错误提示 */
-        .error-msg {
-            display: none; padding: 40px; text-align: center; color: var(--text-black); 
-            font-size: 20px; font-weight: bold; background: var(--accent-orange); border-bottom: 4px solid var(--text-black);
+        /* 波普评分标签 */
+        .td-rating span {
+            display: inline-block;
+            background-color: var(--accent-yellow);
+            color: var(--text-black);
+            padding: 4px 12px;
+            font-weight: 900;
+            text-transform: uppercase;
+            border: 2px solid var(--text-black);
+            box-shadow: 3px 3px 0 var(--text-black);
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        tr:hover .td-rating span {
+            background-color: var(--white);
+            color: var(--text-black);
+            box-shadow: 3px 3px 0 var(--accent-orange);
         }
 
         @media (max-width: 900px) {
@@ -190,43 +102,30 @@
 <body>
 
     <div class="main-wrapper">
-        
-        <!-- 头部 -->
         <header class="header">
             <h1>CRAWLER DATA</h1>
-            <div class="badge">RECORDS_ACTIVE</div>
+            <div class="badge">STATIC_MOCKUP</div>
         </header>
 
-        <!-- 数据卡片 -->
         <section class="stats-grid">
             <div class="stat-card">
                 <h3>TOTAL_BOOKS</h3>
                 <div class="stat-value" id="total-books">--</div>
             </div>
-            
             <div class="stat-card">
                 <h3>AVG_PRICE_GBP</h3>
                 <div class="stat-value" id="avg-price">--</div>
             </div>
-
             <div class="stat-card" id="status-container">
                 <h3>DATA_LINK</h3>
                 <div class="stat-value" id="status">WAIT</div>
             </div>
         </section>
 
-        <!-- 数据表格 -->
         <section class="table-panel">
             <div class="table-header">
                 <span>DATABASE_VIEW.JSON</span>
-                <div class="dots">
-                    <span></span><span></span><span></span>
-                </div>
-            </div>
-            
-            <div class="error-msg" id="error-box">
-                [ ERROR ] FILE NOT FOUND.<br>
-                <span style="font-size: 14px;">请确保已运行 `node index.js` 且 JSON 文件在同目录。</span>
+                <div class="dots"><span></span><span></span><span></span></div>
             </div>
             
             <table id="book-table">
@@ -234,62 +133,58 @@
                     <tr>
                         <th>TITLE</th>
                         <th>PRICE</th>
-                        <th>UPC_CODE</th>
-                        <th>STOCK</th>
+                        <th>RATING</th>
                     </tr>
                 </thead>
                 <tbody id="table-body">
-                    <tr><td colspan="4" style="text-align: center; font-weight: bold;">LOADING...</td></tr>
+                    <tr><td colspan="3" style="text-align: center; font-weight: bold;">LOADING DATA...</td></tr>
                 </tbody>
             </table>
         </section>
-
     </div>
 
     <script>
-        // 读取数据
-        fetch('./books_detailed.json')
-            .then(response => {
-                if(!response.ok) throw new Error('File not found');
-                return response.json();
-            })
-            .then(data => {
-                document.getElementById('status').innerText = 'OK';
-                document.getElementById('status').style.color = '#111111';
-                document.getElementById('status-container').style.backgroundColor = '#85B9E0'; // 恢复蓝色
-                
-                document.getElementById('total-books').innerText = data.length;
-                
-                let totalPrice = 0;
-                data.forEach(book => {
-                    totalPrice += parseFloat(book.price.replace('£', ''));
-                });
-                document.getElementById('avg-price').innerText = (totalPrice / data.length).toFixed(2);
+        // 1. 直接把刚才爬下来的数据写死在这里，不需要读本地 JSON 文件了
+        const bookData = [
+            { title: "A Light in the Attic", price: "£51.77", rating: "Three" },
+            { title: "Tipping the Velvet", price: "£53.74", rating: "One" },
+            { title: "Soumission", price: "£50.10", rating: "One" },
+            { title: "Sharp Objects", price: "£47.82", rating: "Four" },
+            { title: "Sapiens: A Brief History of Humankind", price: "£54.23", rating: "Five" },
+            { title: "The Requiem Red", price: "£22.65", rating: "One" },
+            { title: "The Dirty Little Secrets of Getting Your Dream Job", price: "£33.34", rating: "Four" },
+            { title: "The Coming Woman", price: "£17.93", rating: "Three" },
+            { title: "The Boys in the Boat", price: "£22.60", rating: "Four" },
+            { title: "The Black Maria", price: "£52.15", rating: "One" }
+        ];
 
-                const tbody = document.getElementById('table-body');
-                tbody.innerHTML = ''; 
-                
-                data.forEach((book, index) => {
-                    // 添加一点渲染延迟，让页面有动态出现的感觉
-                    setTimeout(() => {
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td class="td-title">${book.title}</td>
-                            <td class="td-price">${book.price}</td>
-                            <td><span class="td-upc">${book.upc}</span></td>
-                            <td>${book.stock}</td>
-                        `;
-                        tbody.appendChild(tr);
-                    }, index * 40);
-                });
-            })
-            .catch(error => {
-                console.error('读取失败:', error);
-                document.getElementById('status').innerText = 'FAIL';
-                document.getElementById('status-container').style.backgroundColor = '#FF7B00';
-                document.getElementById('error-box').style.display = 'block';
-                document.getElementById('table-body').innerHTML = '';
-            });
+        // 2. 计算统计数据
+        document.getElementById('total-books').innerText = bookData.length;
+        
+        let totalPrice = 0;
+        bookData.forEach(book => {
+            totalPrice += parseFloat(book.price.replace('£', ''));
+        });
+        document.getElementById('avg-price').innerText = (totalPrice / bookData.length).toFixed(2);
+
+        document.getElementById('status').innerText = 'ONLINE';
+
+        // 3. 渲染表格
+        const tbody = document.getElementById('table-body');
+        tbody.innerHTML = ''; 
+        
+        bookData.forEach((book, index) => {
+            // 加个小延迟，让表格一行行弹出来，有动画感
+            setTimeout(() => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="td-title">${book.title}</td>
+                    <td class="td-price">${book.price}</td>
+                    <td class="td-rating"><span>${book.rating}</span></td>
+                `;
+                tbody.appendChild(tr);
+            }, index * 50);
+        });
     </script>
 </body>
 </html>
